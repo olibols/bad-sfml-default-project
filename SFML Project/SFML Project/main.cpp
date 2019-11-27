@@ -40,6 +40,15 @@ int main()
 				window.close();
 		}
 
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+			sf::Vector2i pos = sf::Mouse::getPosition(window);
+			pos /= 15;
+			try {
+				tiles.at(pos.x).at(pos.y).shape.setFillColor(sf::Color(0, 0, 0));
+			}
+			catch (std::exception e) {}
+		}
+
 		window.clear(sf::Color(30, 30, 30));
 
 		for (auto& arr : tiles) {
