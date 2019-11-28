@@ -6,6 +6,12 @@ void drawSFML(sf::RenderWindow& window, sf::Drawable& drawable) {
 	window.draw(drawable);
 }
 
+enum TileType {
+	Filled,
+	Empty,
+	Visited
+};
+
 struct GridTile {
 
 	GridTile() {
@@ -13,8 +19,41 @@ struct GridTile {
 		shape.setPosition(sf::Vector2f(1.0, 1.0));
 	};
 
+	TileType type = Empty;
+
 	sf::RectangleShape shape = sf::RectangleShape(sf::Vector2f(10.f, 10.f));
 };
+
+GridTile getTile(std::array<std::array<GridTile, 50>, 50>& tiles, int x, int z) {
+	return tiles[x][z];
+}
+
+bool traverse(std::array<std::array<GridTile, 50>, 50>& tiles, int x, int z) {
+	if (!(x > 0 && x < 50 && z > 0 && z < 50)) return false;
+	if (tiles[x][z].type == TileType::Filled) return false;
+
+	if (x == 25 && z == 25) return true;
+	else tiles[x][z].type = TileType::Visited;
+
+	if (traverse(tiles, x - 1, z)) {
+		tiles[x - 1][z].type = TileType::Visited;
+		return true;
+	}
+	if (traverse(tiles, x + 1, z)) {
+		tiles[x + 1][z].type = TileType::Visited;
+		return true;
+	}
+	if (traverse(tiles, x, z + 1)) {
+		tiles[x][z + 1].type = TileType::Visited;
+		return true;
+	}
+	if (traverse(tiles, x, z - 1)) {
+		tiles[x][z - 1].type = TileType::Visited;
+		return true;
+	}
+
+	return false;
+}
 
 int main()
 {
@@ -53,6 +92,7 @@ int main()
 
 		for (auto& arr : tiles) {
 			for (auto& tile : arr) {
+				if (tile.type == TileType::Visited) tile.shape.setFillColor(sf::Color(0, 255, 0));
 				drawSFML(window, tile.shape);
 			}
 		}
